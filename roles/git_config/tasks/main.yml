@@ -7,6 +7,10 @@
 - name: Read current Git user name
   ansible.builtin.command:
     cmd: git config --global --get user.name
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
   register: git_user_name_current
   changed_when: false
   failed_when: false
@@ -14,11 +18,19 @@
 - name: Set Git user name
   ansible.builtin.command:
     cmd: git config --global user.name "{{ git_user_name }}"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
   when: git_user_name_current.rc != 0 or git_user_name_current.stdout != git_user_name
 
 - name: Read current Git user email
   ansible.builtin.command:
     cmd: git config --global --get user.email
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
   register: git_user_email_current
   changed_when: false
   failed_when: false
@@ -26,11 +38,19 @@
 - name: Set Git user email
   ansible.builtin.command:
     cmd: git config --global user.email "{{ git_user_email }}"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
   when: git_user_email_current.rc != 0 or git_user_email_current.stdout != git_user_email
 
 - name: Read current Git editor
   ansible.builtin.command:
     cmd: git config --global --get core.editor
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
   register: git_core_editor_current
   changed_when: false
   failed_when: false
@@ -38,4 +58,8 @@
 - name: Set Git editor
   ansible.builtin.command:
     cmd: git config --global core.editor "{{ git_core_editor }}"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
   when: git_core_editor_current.rc != 0 or git_core_editor_current.stdout != git_core_editor

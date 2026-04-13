@@ -5,15 +5,136 @@
       - ansible_facts["distribution"] == "Archlinux"
     fail_msg: "This repo currently targets Arch Linux only."
 
-- name: Explain Doppler support status
-  ansible.builtin.debug:
-    msg: >-
-      Doppler setup is scaffolded but disabled by default. Set doppler_install=true
-      and add login/config tasks when you are ready to wire in secrets.
-
-- name: Install Doppler packages when enabled
+- name: Install Doppler packages
   ansible.builtin.package:
     name: "{{ doppler_packages }}"
     state: present
-  when:
-    - doppler_install | bool
+
+- name: Ensure SSH directory exists
+  ansible.builtin.file:
+    path: "{{ bootstrap_home }}/.ssh"
+    state: directory
+    mode: "0700"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+
+- name: Check Doppler authentication
+  ansible.builtin.command:
+    cmd: doppler me
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  register: doppler_me
+  changed_when: false
+  failed_when: false
+
+- name: Stop if Doppler is not authenticated
+  ansible.builtin.fail:
+    msg: >-
+      Doppler is not authenticated for {{ bootstrap_user }}. Run 'doppler login'
+      or configure a service token, then rerun playbooks/secrets.yml.
+  when: doppler_me.rc != 0
+
+- name: Read Git user name from Doppler
+  ansible.builtin.command:
+    cmd: >-
+      doppler secrets get {{ doppler_git_user_name_secret }} --plain
+      --project {{ doppler_project }} --config {{ doppler_config }}
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  register: doppler_git_user_name
+  changed_when: false
+  no_log: true
+
+- name: Read Git user email from Doppler
+  ansible.builtin.command:
+    cmd: >-
+      doppler secrets get {{ doppler_git_user_email_secret }} --plain
+      --project {{ doppler_project }} --config {{ doppler_config }}
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  register: doppler_git_user_email
+  changed_when: false
+  no_log: true
+
+- name: Read SSH private key from Doppler
+  ansible.builtin.command:
+    cmd: >-
+      doppler secrets get {{ doppler_ssh_private_key_secret }} --plain
+      --project {{ doppler_project }} --config {{ doppler_config }}
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  register: doppler_ssh_private_key
+  changed_when: false
+  no_log: true
+
+- name: Read SSH public key from Doppler
+  ansible.builtin.command:
+    cmd: >-
+      doppler secrets get {{ doppler_ssh_public_key_secret }} --plain
+      --project {{ doppler_project }} --config {{ doppler_config }}
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  register: doppler_ssh_public_key
+  changed_when: false
+  no_log: true
+
+- name: Configure Git user name from Doppler
+  ansible.builtin.command:
+    cmd: git config --global user.name "{{ doppler_git_user_name.stdout }}"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  no_log: true
+
+- name: Configure Git user email from Doppler
+  ansible.builtin.command:
+    cmd: git config --global user.email "{{ doppler_git_user_email.stdout }}"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  no_log: true
+
+- name: Install SSH private key from Doppler
+  ansible.builtin.copy:
+    content: "{{ doppler_ssh_private_key.stdout }}"
+    dest: "{{ doppler_ssh_key_path }}"
+    mode: "0600"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+  no_log: true
+
+- name: Install SSH public key from Doppler
+  ansible.builtin.copy:
+    content: "{{ doppler_ssh_public_key.stdout }}"
+    dest: "{{ doppler_ssh_key_path }}.pub"
+    mode: "0644"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+  no_log: true
+
+- name: Configure SSH for GitHub
+  ansible.builtin.blockinfile:
+    path: "{{ bootstrap_home }}/.ssh/config"
+    create: true
+    mode: "0600"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    marker: "# {mark} ANSIBLE PULL ARCH GITHUB"
+    block: |
+      Host github.com
+        HostName github.com
+        User git
+        IdentityFile {{ doppler_ssh_key_path }}
+        IdentitiesOnly yes

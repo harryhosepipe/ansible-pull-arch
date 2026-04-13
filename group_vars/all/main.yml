@@ -1,4 +1,7 @@
 ---
+bootstrap_user: "{{ lookup('env', 'BOOTSTRAP_USER') | default(ansible_user_id, true) }}"
+bootstrap_home: "{{ lookup('env', 'BOOTSTRAP_HOME') | default(ansible_env.HOME, true) }}"
+
 base_packages:
   - curl
   - git
@@ -10,6 +13,13 @@ base_packages:
 doppler_install: false
 doppler_packages:
   - doppler
+doppler_project: base
+doppler_config: dev_personal
+doppler_git_user_name_secret: GIT_USER_NAME
+doppler_git_user_email_secret: GIT_USER_EMAIL
+doppler_ssh_private_key_secret: SSH_PRIVATE_KEY
+doppler_ssh_public_key_secret: SSH_PUBLIC_KEY
+doppler_ssh_key_path: "{{ bootstrap_home }}/.ssh/id_ed25519"
 
 git_user_name: Pablo
 git_user_email: pablo@renderbros.com

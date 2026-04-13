@@ -12,9 +12,11 @@
 
 - name: Ensure local bin directory exists
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.local/bin"
+    path: "{{ bootstrap_home }}/.local/bin"
     state: directory
     mode: "0755"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
 
 - name: Show current convergence scope
   ansible.builtin.debug:

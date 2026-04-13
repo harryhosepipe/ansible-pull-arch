@@ -51,7 +51,7 @@ The initial scaffold includes:
 - a git playbook
 - Arch package installation
 - conservative, idempotent defaults
-- a separate secrets playbook stub for Doppler-based setup
+- a separate secrets playbook for Doppler-based Git and SSH setup
 
 ## Next additions
 
@@ -67,4 +67,18 @@ As you grow the repo, add isolated playbooks such as:
 - `playbooks/base.yml`: base packages and common machine setup
 - `playbooks/git.yml`: global Git identity and editor
 - `playbooks/github.yml`: installs GitHub CLI
-- `playbooks/secrets.yml`: secrets tooling stub for later Doppler setup
+- `playbooks/secrets.yml`: installs Doppler, sets Git identity from Doppler, and installs SSH keys
+
+## Secrets Playbook
+
+`playbooks/secrets.yml` currently expects these Doppler settings:
+
+- project: `base`
+- config: `dev_personal`
+- secrets: `GIT_USER_NAME`, `GIT_USER_EMAIL`, `SSH_PRIVATE_KEY`, `SSH_PUBLIC_KEY`
+
+Run it with:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/harryhosepipe/ansible-pull-arch/main/bin/bootstrap | bash -s -- --playbook playbooks/secrets.yml
+```
