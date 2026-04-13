@@ -1,0 +1,69 @@
+---
+- name: Ensure this playbook only runs on Arch
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["distribution"] == "Archlinux"
+    fail_msg: "This repo currently targets Arch Linux only."
+
+- name: Install Zsh
+  ansible.builtin.package:
+    name: "{{ zsh_packages }}"
+    state: present
+
+- name: Ensure Zsh config directory exists
+  ansible.builtin.file:
+    path: "{{ zsh_config_dir }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+
+- name: Check whether Oh My Posh is already installed
+  ansible.builtin.command:
+    cmd: "{{ oh_my_posh_bin_dir }}/oh-my-posh version"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  register: oh_my_posh_version
+  changed_when: false
+  failed_when: false
+
+- name: Install Oh My Posh using the official installer
+  ansible.builtin.shell: >
+    curl -fsSL https://ohmyposh.dev/install.sh | bash -s -- -d "{{ oh_my_posh_bin_dir }}"
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  when: oh_my_posh_version.rc != 0
+
+- name: Set ZDOTDIR in zsh environment
+  ansible.builtin.blockinfile:
+    path: "{{ zsh_env_path }}"
+    create: true
+    mode: "0644"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    marker: "# {mark} ANSIBLE PULL ARCH ZSH"
+    block: |
+      export ZDOTDIR="{{ zsh_config_dir }}"
+
+- name: Configure Zsh rc
+  ansible.builtin.blockinfile:
+    path: "{{ zsh_rc_path }}"
+    create: true
+    mode: "0644"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    marker: "# {mark} ANSIBLE PULL ARCH ZSHRC"
+    block: |
+      export PATH="$HOME/.local/bin:$PATH"
+      eval "$(oh-my-posh init zsh)"
+
+- name: Set Zsh as default shell for bootstrap user
+  ansible.builtin.user:
+    name: "{{ bootstrap_user }}"
+    shell: "{{ zsh_shell_path }}"
