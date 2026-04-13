@@ -123,7 +123,7 @@
 
 - name: Install SSH private key from Doppler
   ansible.builtin.copy:
-    content: "{{ doppler_ssh_private_key.stdout }}"
+    content: "{{ (doppler_ssh_private_key.stdout | replace('\\\\n', '\n') | trim) ~ '\n' }}"
     dest: "{{ doppler_ssh_key_path }}"
     mode: "0600"
     owner: "{{ bootstrap_user }}"
@@ -132,7 +132,7 @@
 
 - name: Install SSH public key from Doppler
   ansible.builtin.copy:
-    content: "{{ doppler_ssh_public_key.stdout }}"
+    content: "{{ (doppler_ssh_public_key.stdout | replace('\\\\n', '\n') | trim) ~ '\n' }}"
     dest: "{{ doppler_ssh_key_path }}.pub"
     mode: "0644"
     owner: "{{ bootstrap_user }}"
