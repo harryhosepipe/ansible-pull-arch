@@ -67,11 +67,11 @@ As you grow the repo, add isolated playbooks such as:
 
 ## Current playbooks
 
-- `playbooks/base.yml`: base packages, XDG directories, Doppler install, Git identity from Doppler, SSH key setup, and Neovim/LazyVim setup
+- `playbooks/base.yml`: base packages, XDG directories, Doppler install, Git identity from Doppler, SSH key setup, Neovim/LazyVim setup, and Zsh/Oh My Posh setup
 - `playbooks/git.yml`: global Git identity and editor
 - `playbooks/github.yml`: installs GitHub CLI
 - `playbooks/neovim.yml`: isolated Neovim/LazyVim playbook for development and testing
-- `playbooks/zsh.yml`: installs zsh, sets it as the default shell, installs Oh My Posh, and installs a Nerd Font
+- `playbooks/zsh.yml`: isolated Zsh/Oh My Posh playbook for development and testing
 - `playbooks/secrets.yml`: manual rerun path for Doppler, Git identity, and SSH key setup
 
 ## Doppler Flow
