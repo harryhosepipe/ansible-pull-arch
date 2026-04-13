@@ -112,6 +112,8 @@ run_ansible_pull() {
     --inventory "localhost," \
     --limit localhost \
     --connection local \
+    --extra-vars "bootstrap_user=${BOOTSTRAP_USER}" \
+    --extra-vars "bootstrap_home=${BOOTSTRAP_HOME}" \
     "${PLAYBOOK}" \
     "${EXTRA_ARGS[@]}"
 }
