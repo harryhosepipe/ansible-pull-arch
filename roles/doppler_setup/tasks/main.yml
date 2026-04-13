@@ -33,7 +33,7 @@
   ansible.builtin.fail:
     msg: >-
       Doppler is not authenticated for {{ bootstrap_user }}. Run 'doppler login'
-      or configure a service token, then rerun playbooks/secrets.yml.
+      as {{ bootstrap_user }}, then rerun the same bootstrap command.
   when: doppler_me.rc != 0
 
 - name: Read Git user name from Doppler

@@ -8,3 +8,4 @@
 
   roles:
     - role: common_base
+    - role: doppler_setup

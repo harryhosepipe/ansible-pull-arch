@@ -51,7 +51,7 @@ The initial scaffold includes:
 - a git playbook
 - Arch package installation
 - conservative, idempotent defaults
-- a separate secrets playbook for Doppler-based Git and SSH setup
+- Doppler-based Git and SSH setup as part of the base convergence flow
 
 ## Next additions
 
@@ -64,20 +64,33 @@ As you grow the repo, add isolated playbooks such as:
 
 ## Current playbooks
 
-- `playbooks/base.yml`: base packages and common machine setup
+- `playbooks/base.yml`: base packages, Doppler install, Git identity from Doppler, and SSH key setup
 - `playbooks/git.yml`: global Git identity and editor
 - `playbooks/github.yml`: installs GitHub CLI
-- `playbooks/secrets.yml`: installs Doppler, sets Git identity from Doppler, and installs SSH keys
+- `playbooks/secrets.yml`: manual rerun path for Doppler, Git identity, and SSH key setup
 
-## Secrets Playbook
+## Doppler Flow
 
-`playbooks/secrets.yml` currently expects these Doppler settings:
+The default bootstrap command stays the same:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/harryhosepipe/ansible-pull-arch/main/bin/bootstrap | bash
+```
+
+`playbooks/base.yml` now expects these Doppler settings:
 
 - project: `base`
 - config: `dev_personal`
 - secrets: `GIT_USER_NAME`, `GIT_USER_EMAIL`, `SSH_PRIVATE_KEY`, `SSH_PUBLIC_KEY`
 
-Run it with:
+On a brand new machine:
+
+1. run the bootstrap command
+2. if Doppler is not authenticated yet, the playbook will stop with a clear message
+3. run `doppler login`
+4. rerun the same bootstrap command
+
+You can still rerun the secrets portion manually with:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/harryhosepipe/ansible-pull-arch/main/bin/bootstrap | bash -s -- --playbook playbooks/secrets.yml
