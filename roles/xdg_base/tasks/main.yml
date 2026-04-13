@@ -1,0 +1,66 @@
+---
+- name: Ensure standard XDG directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+  loop:
+    - "{{ xdg_config_home }}"
+    - "{{ xdg_cache_home }}"
+    - "{{ xdg_data_home }}"
+    - "{{ xdg_state_home }}"
+    - "{{ xdg_config_home }}/environment.d"
+    - "{{ git_config_dir }}"
+    - "{{ doppler_config_dir }}"
+    - "{{ bootstrap_home }}/.local/bin"
+
+- name: Check for legacy Doppler config
+  ansible.builtin.stat:
+    path: "{{ bootstrap_home }}/.doppler/.doppler.yaml"
+  register: legacy_doppler_config
+
+- name: Check for XDG Doppler config
+  ansible.builtin.stat:
+    path: "{{ doppler_config_dir }}/.doppler.yaml"
+  register: xdg_doppler_config
+
+- name: Migrate legacy Doppler config into XDG config home
+  ansible.builtin.command:
+    cmd: cp -a {{ bootstrap_home }}/.doppler/. {{ doppler_config_dir }}/
+  when:
+    - legacy_doppler_config.stat.exists
+    - not xdg_doppler_config.stat.exists
+
+- name: Write XDG environment file
+  ansible.builtin.copy:
+    dest: "{{ xdg_config_home }}/environment.d/10-xdg.conf"
+    mode: "0644"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    content: |
+      XDG_CONFIG_HOME={{ xdg_config_home }}
+      XDG_CACHE_HOME={{ xdg_cache_home }}
+      XDG_DATA_HOME={{ xdg_data_home }}
+      XDG_STATE_HOME={{ xdg_state_home }}
+      DOPPLER_CONFIG_DIR={{ doppler_config_dir }}
+
+- name: Export XDG variables in profile
+  ansible.builtin.blockinfile:
+    path: "{{ bootstrap_home }}/.profile"
+    create: true
+    mode: "0644"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    marker: "# {mark} ANSIBLE PULL ARCH XDG"
+    block: |
+      export XDG_CONFIG_HOME="{{ xdg_config_home }}"
+      export XDG_CACHE_HOME="{{ xdg_cache_home }}"
+      export XDG_DATA_HOME="{{ xdg_data_home }}"
+      export XDG_STATE_HOME="{{ xdg_state_home }}"
+      export DOPPLER_CONFIG_DIR="{{ doppler_config_dir }}"
+      case ":$PATH:" in
+        *:"$HOME/.local/bin":*) ;;
+        *) export PATH="$HOME/.local/bin:$PATH" ;;
+      esac

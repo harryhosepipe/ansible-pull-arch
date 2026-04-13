@@ -11,6 +11,8 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    GIT_CONFIG_GLOBAL: "{{ git_config_global_path }}"
+    XDG_CONFIG_HOME: "{{ xdg_config_home }}"
   register: git_user_name_current
   changed_when: false
   failed_when: false
@@ -22,6 +24,8 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    GIT_CONFIG_GLOBAL: "{{ git_config_global_path }}"
+    XDG_CONFIG_HOME: "{{ xdg_config_home }}"
   when: git_user_name_current.rc != 0 or git_user_name_current.stdout != git_user_name
 
 - name: Read current Git user email
@@ -31,6 +35,8 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    GIT_CONFIG_GLOBAL: "{{ git_config_global_path }}"
+    XDG_CONFIG_HOME: "{{ xdg_config_home }}"
   register: git_user_email_current
   changed_when: false
   failed_when: false
@@ -42,6 +48,8 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    GIT_CONFIG_GLOBAL: "{{ git_config_global_path }}"
+    XDG_CONFIG_HOME: "{{ xdg_config_home }}"
   when: git_user_email_current.rc != 0 or git_user_email_current.stdout != git_user_email
 
 - name: Read current Git editor
@@ -51,6 +59,8 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    GIT_CONFIG_GLOBAL: "{{ git_config_global_path }}"
+    XDG_CONFIG_HOME: "{{ xdg_config_home }}"
   register: git_core_editor_current
   changed_when: false
   failed_when: false
@@ -62,4 +72,6 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    GIT_CONFIG_GLOBAL: "{{ git_config_global_path }}"
+    XDG_CONFIG_HOME: "{{ xdg_config_home }}"
   when: git_core_editor_current.rc != 0 or git_core_editor_current.stdout != git_core_editor

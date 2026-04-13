@@ -8,4 +8,5 @@
 
   roles:
     - role: common_base
+    - role: xdg_base
     - role: doppler_setup

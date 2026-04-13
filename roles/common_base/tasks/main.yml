@@ -12,7 +12,7 @@
 
 - name: Ensure local bin directory exists
   ansible.builtin.file:
-    path: "{{ bootstrap_home }}/.local/bin"
+    path: "{{ xdg_data_home | dirname }}/bin"
     state: directory
     mode: "0755"
     owner: "{{ bootstrap_user }}"

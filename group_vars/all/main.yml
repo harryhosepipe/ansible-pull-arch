@@ -1,6 +1,13 @@
 ---
 bootstrap_user: "{{ lookup('env', 'BOOTSTRAP_USER') | default(lookup('env', 'USER'), true) }}"
 bootstrap_home: "{{ lookup('env', 'BOOTSTRAP_HOME') | default(lookup('env', 'HOME'), true) }}"
+xdg_config_home: "{{ bootstrap_home }}/.config"
+xdg_cache_home: "{{ bootstrap_home }}/.cache"
+xdg_data_home: "{{ bootstrap_home }}/.local/share"
+xdg_state_home: "{{ bootstrap_home }}/.local/state"
+git_config_dir: "{{ xdg_config_home }}/git"
+git_config_global_path: "{{ git_config_dir }}/config"
+doppler_config_dir: "{{ xdg_config_home }}/doppler"
 
 base_packages:
   - curl

@@ -13,6 +13,8 @@
 - name: Check whether Doppler CLI is already installed
   ansible.builtin.command:
     cmd: doppler --version
+  environment:
+    DOPPLER_CONFIG_DIR: "{{ doppler_config_dir }}"
   register: doppler_version
   changed_when: false
   failed_when: false
@@ -23,6 +25,8 @@
     || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sh
   args:
     executable: /bin/bash
+  environment:
+    DOPPLER_CONFIG_DIR: "{{ doppler_config_dir }}"
   when: doppler_version.rc != 0
 
 - name: Ensure SSH directory exists
@@ -40,6 +44,7 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    DOPPLER_CONFIG_DIR: "{{ doppler_config_dir }}"
   register: doppler_me
   changed_when: false
   failed_when: false
@@ -60,6 +65,7 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    DOPPLER_CONFIG_DIR: "{{ doppler_config_dir }}"
   register: doppler_git_user_name
   changed_when: false
   no_log: true
@@ -73,6 +79,7 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    DOPPLER_CONFIG_DIR: "{{ doppler_config_dir }}"
   register: doppler_git_user_email
   changed_when: false
   no_log: true
@@ -86,6 +93,7 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    DOPPLER_CONFIG_DIR: "{{ doppler_config_dir }}"
   register: doppler_ssh_private_key
   changed_when: false
   no_log: true
@@ -99,6 +107,7 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    DOPPLER_CONFIG_DIR: "{{ doppler_config_dir }}"
   register: doppler_ssh_public_key
   changed_when: false
   no_log: true
@@ -110,6 +119,8 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    GIT_CONFIG_GLOBAL: "{{ git_config_global_path }}"
+    XDG_CONFIG_HOME: "{{ xdg_config_home }}"
   no_log: true
 
 - name: Configure Git user email from Doppler
@@ -119,6 +130,8 @@
   become_user: "{{ bootstrap_user }}"
   environment:
     HOME: "{{ bootstrap_home }}"
+    GIT_CONFIG_GLOBAL: "{{ git_config_global_path }}"
+    XDG_CONFIG_HOME: "{{ xdg_config_home }}"
   no_log: true
 
 - name: Install SSH private key from Doppler
