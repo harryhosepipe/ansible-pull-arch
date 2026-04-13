@@ -6,6 +6,8 @@ readonly DEFAULT_REPO_URL="https://github.com/harryhosepipe/ansible-pull-arch.gi
 readonly DEFAULT_PLAYBOOK="playbooks/base.yml"
 readonly DEFAULT_DEST="${HOME}/.local/share/linux-env"
 
+BOOTSTRAP_USER="${SUDO_USER:-${USER}}"
+BOOTSTRAP_HOME="${HOME}"
 REPO_URL="${DEFAULT_REPO_URL}"
 BRANCH="${DEFAULT_BRANCH}"
 PLAYBOOK="${DEFAULT_PLAYBOOK}"
@@ -101,7 +103,7 @@ run_ansible_pull() {
   mkdir -p "${DEST}"
 
   log "Running ansible-pull from ${REPO_URL}"
-  ansible-pull \
+  sudo --preserve-env=HOME,BOOTSTRAP_USER,BOOTSTRAP_HOME ansible-pull \
     --accept-host-key \
     --clean \
     --directory "${DEST}" \
