@@ -27,16 +27,16 @@ The bootstrap script keeps its job small:
 Use the bootstrap script from raw GitHub:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<your-user>/<your-repo>/main/bin/bootstrap | bash -s -- \
-  --repo https://github.com/<your-user>/<your-repo>.git \
+curl -fsSL https://raw.githubusercontent.com/harryhosepipe/ansible-pull-arch/main/bin/bootstrap | bash -s -- \
+  --repo https://github.com/harryhosepipe/ansible-pull-arch.git \
   --playbook playbooks/base.yml
 ```
 
 Safer inspectable variant:
 
 ```bash
-curl -fsSLo /tmp/linux-env-bootstrap.sh https://raw.githubusercontent.com/<your-user>/<your-repo>/main/bin/bootstrap
-bash /tmp/linux-env-bootstrap.sh --repo https://github.com/<your-user>/<your-repo>.git --playbook playbooks/base.yml
+curl -fsSLo /tmp/linux-env-bootstrap.sh https://raw.githubusercontent.com/harryhosepipe/ansible-pull-arch/main/bin/bootstrap
+bash /tmp/linux-env-bootstrap.sh --repo https://github.com/harryhosepipe/ansible-pull-arch.git --playbook playbooks/base.yml
 ```
 
 ## Current scope
