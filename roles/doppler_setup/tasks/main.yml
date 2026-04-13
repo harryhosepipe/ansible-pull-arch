@@ -2,7 +2,7 @@
 - name: Ensure this playbook only runs on Arch
   ansible.builtin.assert:
     that:
-      - ansible_distribution == "Archlinux"
+      - ansible_facts["distribution"] == "Archlinux"
     fail_msg: "This repo currently targets Arch Linux only."
 
 - name: Explain Doppler support status

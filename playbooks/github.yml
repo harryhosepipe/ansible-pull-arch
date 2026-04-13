@@ -3,6 +3,8 @@
   hosts: localhost
   connection: local
   gather_facts: true
+  vars_files:
+    - ../group_vars/all/main.yml
 
   roles:
     - role: github_cli
