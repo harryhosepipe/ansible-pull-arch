@@ -71,7 +71,7 @@ As you grow the repo, add isolated playbooks such as:
 - `playbooks/git.yml`: global Git identity and editor
 - `playbooks/github.yml`: installs GitHub CLI
 - `playbooks/neovim.yml`: isolated Neovim/LazyVim playbook for development and testing
-- `playbooks/zsh.yml`: installs zsh, sets it as the default shell, and installs Oh My Posh
+- `playbooks/zsh.yml`: installs zsh, sets it as the default shell, installs Oh My Posh, and installs a Nerd Font
 - `playbooks/secrets.yml`: manual rerun path for Doppler, Git identity, and SSH key setup
 
 ## Doppler Flow

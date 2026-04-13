@@ -56,6 +56,8 @@ neovim_lazyvim_repo: https://github.com/LazyVim/starter
 
 zsh_packages:
   - zsh
+zsh_font_packages:
+  - ttf-jetbrains-mono-nerd
 zsh_shell_path: /usr/bin/zsh
 zsh_config_dir: "{{ xdg_config_home }}/zsh"
 zsh_rc_path: "{{ zsh_config_dir }}/.zshrc"

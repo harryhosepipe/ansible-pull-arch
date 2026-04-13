@@ -10,6 +10,11 @@
     name: "{{ zsh_packages }}"
     state: present
 
+- name: Install Nerd Font for Oh My Posh
+  ansible.builtin.package:
+    name: "{{ zsh_font_packages }}"
+    state: present
+
 - name: Ensure Zsh config directory exists
   ansible.builtin.file:
     path: "{{ zsh_config_dir }}"
