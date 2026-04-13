@@ -1,6 +1,6 @@
 ---
-bootstrap_user: "{{ lookup('env', 'BOOTSTRAP_USER') | default(ansible_user_id, true) }}"
-bootstrap_home: "{{ lookup('env', 'BOOTSTRAP_HOME') | default(ansible_env.HOME, true) }}"
+bootstrap_user: "{{ lookup('env', 'BOOTSTRAP_USER') | default(lookup('env', 'USER'), true) }}"
+bootstrap_home: "{{ lookup('env', 'BOOTSTRAP_HOME') | default(lookup('env', 'HOME'), true) }}"
 
 base_packages:
   - curl
@@ -12,7 +12,7 @@ base_packages:
 
 doppler_install: false
 doppler_packages:
-  - doppler
+  - gnupg
 doppler_project: base
 doppler_config: dev_personal
 doppler_git_user_name_secret: GIT_USER_NAME

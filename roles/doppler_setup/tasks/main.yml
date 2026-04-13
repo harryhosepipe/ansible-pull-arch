@@ -10,6 +10,21 @@
     name: "{{ doppler_packages }}"
     state: present
 
+- name: Check whether Doppler CLI is already installed
+  ansible.builtin.command:
+    cmd: doppler --version
+  register: doppler_version
+  changed_when: false
+  failed_when: false
+
+- name: Install Doppler CLI using the official shell installer
+  ansible.builtin.shell: >
+    (curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh
+    || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sh
+  args:
+    executable: /bin/bash
+  when: doppler_version.rc != 0
+
 - name: Ensure SSH directory exists
   ansible.builtin.file:
     path: "{{ bootstrap_home }}/.ssh"
