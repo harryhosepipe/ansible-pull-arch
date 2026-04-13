@@ -1,0 +1,124 @@
+---
+- name: Ensure this playbook only runs on Arch
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["distribution"] == "Archlinux"
+    fail_msg: "This repo currently targets Arch Linux only."
+
+- name: Install Neovim and LazyVim dependencies
+  ansible.builtin.package:
+    name: "{{ neovim_packages }}"
+    state: present
+
+- name: Check for existing Neovim config
+  ansible.builtin.stat:
+    path: "{{ neovim_config_dir }}"
+  register: neovim_config_dir_stat
+
+- name: Check for existing Neovim data
+  ansible.builtin.stat:
+    path: "{{ neovim_data_dir }}"
+  register: neovim_data_dir_stat
+
+- name: Check for existing Neovim state
+  ansible.builtin.stat:
+    path: "{{ neovim_state_dir }}"
+  register: neovim_state_dir_stat
+
+- name: Check for existing Neovim cache
+  ansible.builtin.stat:
+    path: "{{ neovim_cache_dir }}"
+  register: neovim_cache_dir_stat
+
+- name: Check for existing Neovim config backup
+  ansible.builtin.stat:
+    path: "{{ neovim_config_dir }}.bak"
+  register: neovim_config_backup_stat
+
+- name: Check for existing Neovim data backup
+  ansible.builtin.stat:
+    path: "{{ neovim_data_dir }}.bak"
+  register: neovim_data_backup_stat
+
+- name: Check for existing Neovim state backup
+  ansible.builtin.stat:
+    path: "{{ neovim_state_dir }}.bak"
+  register: neovim_state_backup_stat
+
+- name: Check for existing Neovim cache backup
+  ansible.builtin.stat:
+    path: "{{ neovim_cache_dir }}.bak"
+  register: neovim_cache_backup_stat
+
+- name: Check whether LazyVim is already installed
+  ansible.builtin.stat:
+    path: "{{ neovim_config_dir }}/lua/config/lazy.lua"
+  register: lazyvim_marker
+
+- name: Backup existing Neovim config
+  ansible.builtin.command:
+    cmd: mv "{{ neovim_config_dir }}" "{{ neovim_config_dir }}.bak"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  when:
+    - neovim_config_dir_stat.stat.exists
+    - not neovim_config_backup_stat.stat.exists
+    - not lazyvim_marker.stat.exists
+
+- name: Backup existing Neovim data
+  ansible.builtin.command:
+    cmd: mv "{{ neovim_data_dir }}" "{{ neovim_data_dir }}.bak"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  when:
+    - neovim_data_dir_stat.stat.exists
+    - not neovim_data_backup_stat.stat.exists
+    - not lazyvim_marker.stat.exists
+
+- name: Backup existing Neovim state
+  ansible.builtin.command:
+    cmd: mv "{{ neovim_state_dir }}" "{{ neovim_state_dir }}.bak"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  when:
+    - neovim_state_dir_stat.stat.exists
+    - not neovim_state_backup_stat.stat.exists
+    - not lazyvim_marker.stat.exists
+
+- name: Backup existing Neovim cache
+  ansible.builtin.command:
+    cmd: mv "{{ neovim_cache_dir }}" "{{ neovim_cache_dir }}.bak"
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+  when:
+    - neovim_cache_dir_stat.stat.exists
+    - not neovim_cache_backup_stat.stat.exists
+    - not lazyvim_marker.stat.exists
+
+- name: Clone LazyVim starter
+  ansible.builtin.git:
+    repo: "{{ neovim_lazyvim_repo }}"
+    dest: "{{ neovim_config_dir }}"
+    version: main
+    depth: 1
+    update: false
+  become: true
+  become_user: "{{ bootstrap_user }}"
+  environment:
+    HOME: "{{ bootstrap_home }}"
+    XDG_CONFIG_HOME: "{{ xdg_config_home }}"
+  when: not lazyvim_marker.stat.exists
+
+- name: Remove LazyVim starter git metadata
+  ansible.builtin.file:
+    path: "{{ neovim_config_dir }}/.git"
+    state: absent
+  when: not lazyvim_marker.stat.exists

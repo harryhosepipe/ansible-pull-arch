@@ -49,6 +49,7 @@ The initial scaffold includes:
 
 - a base playbook
 - a git playbook
+- a neovim playbook
 - Arch package installation
 - XDG base directories and environment exports
 - conservative, idempotent defaults
@@ -68,6 +69,7 @@ As you grow the repo, add isolated playbooks such as:
 - `playbooks/base.yml`: base packages, XDG directories, Doppler install, Git identity from Doppler, and SSH key setup
 - `playbooks/git.yml`: global Git identity and editor
 - `playbooks/github.yml`: installs GitHub CLI
+- `playbooks/neovim.yml`: installs Neovim plus LazyVim starter and backs up existing Neovim state once
 - `playbooks/secrets.yml`: manual rerun path for Doppler, Git identity, and SSH key setup
 
 ## Doppler Flow
