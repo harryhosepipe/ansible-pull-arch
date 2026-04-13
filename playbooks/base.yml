@@ -10,3 +10,4 @@
     - role: common_base
     - role: xdg_base
     - role: doppler_setup
+    - role: neovim_setup

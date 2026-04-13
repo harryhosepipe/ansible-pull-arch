@@ -66,10 +66,10 @@ As you grow the repo, add isolated playbooks such as:
 
 ## Current playbooks
 
-- `playbooks/base.yml`: base packages, XDG directories, Doppler install, Git identity from Doppler, and SSH key setup
+- `playbooks/base.yml`: base packages, XDG directories, Doppler install, Git identity from Doppler, SSH key setup, and Neovim/LazyVim setup
 - `playbooks/git.yml`: global Git identity and editor
 - `playbooks/github.yml`: installs GitHub CLI
-- `playbooks/neovim.yml`: installs Neovim plus LazyVim starter and backs up existing Neovim state once
+- `playbooks/neovim.yml`: isolated Neovim/LazyVim playbook for development and testing
 - `playbooks/secrets.yml`: manual rerun path for Doppler, Git identity, and SSH key setup
 
 ## Doppler Flow
