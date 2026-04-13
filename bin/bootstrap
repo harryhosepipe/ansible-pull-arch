@@ -2,10 +2,11 @@
 set -euo pipefail
 
 readonly DEFAULT_BRANCH="main"
+readonly DEFAULT_REPO_URL="https://github.com/harryhosepipe/ansible-pull-arch.git"
 readonly DEFAULT_PLAYBOOK="playbooks/base.yml"
 readonly DEFAULT_DEST="${HOME}/.local/share/linux-env"
 
-REPO_URL=""
+REPO_URL="${DEFAULT_REPO_URL}"
 BRANCH="${DEFAULT_BRANCH}"
 PLAYBOOK="${DEFAULT_PLAYBOOK}"
 DEST="${DEFAULT_DEST}"
@@ -14,11 +15,11 @@ EXTRA_ARGS=()
 usage() {
   cat <<'EOF'
 Usage:
-  bootstrap --repo <git-url> [--branch <branch>] [--playbook <path>] [--dest <path>] [-- <extra ansible-pull args>]
+  bootstrap [--repo <git-url>] [--branch <branch>] [--playbook <path>] [--dest <path>] [-- <extra ansible-pull args>]
 
 Examples:
-  bootstrap --repo https://github.com/example/linux-env.git
-  bootstrap --repo https://github.com/example/linux-env.git --playbook playbooks/base.yml
+  bootstrap
+  bootstrap --playbook playbooks/git.yml
 EOF
 }
 
@@ -94,12 +95,6 @@ parse_args() {
         ;;
     esac
   done
-
-  if [[ -z "${REPO_URL}" ]]; then
-    printf '--repo is required\n' >&2
-    usage >&2
-    exit 1
-  fi
 }
 
 run_ansible_pull() {
