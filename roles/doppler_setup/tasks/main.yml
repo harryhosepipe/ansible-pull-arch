@@ -1,0 +1,19 @@
+---
+- name: Ensure this playbook only runs on Arch
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == "Archlinux"
+    fail_msg: "This repo currently targets Arch Linux only."
+
+- name: Explain Doppler support status
+  ansible.builtin.debug:
+    msg: >-
+      Doppler setup is scaffolded but disabled by default. Set doppler_install=true
+      and add login/config tasks when you are ready to wire in secrets.
+
+- name: Install Doppler packages when enabled
+  ansible.builtin.package:
+    name: "{{ doppler_packages }}"
+    state: present
+  when:
+    - doppler_install | bool

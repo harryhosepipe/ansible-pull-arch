@@ -1,0 +1,19 @@
+---
+base_packages:
+  - curl
+  - git
+  - openssh
+  - sudo
+  - unzip
+  - wget
+
+doppler_install: false
+doppler_packages:
+  - doppler
+
+git_user_name: Pablo
+git_user_email: pablo@renderbros.com
+git_core_editor: nvim
+
+github_cli_packages:
+  - github-cli

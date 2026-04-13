@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly DEFAULT_BRANCH="main"
+readonly DEFAULT_PLAYBOOK="playbooks/base.yml"
+readonly DEFAULT_DEST="${HOME}/.local/share/linux-env"
+
+REPO_URL=""
+BRANCH="${DEFAULT_BRANCH}"
+PLAYBOOK="${DEFAULT_PLAYBOOK}"
+DEST="${DEFAULT_DEST}"
+EXTRA_ARGS=()
+
+usage() {
+  cat <<'EOF'
+Usage:
+  bootstrap --repo <git-url> [--branch <branch>] [--playbook <path>] [--dest <path>] [-- <extra ansible-pull args>]
+
+Examples:
+  bootstrap --repo https://github.com/example/linux-env.git
+  bootstrap --repo https://github.com/example/linux-env.git --playbook playbooks/base.yml
+EOF
+}
+
+log() {
+  printf '[bootstrap] %s\n' "$*"
+}
+
+require_sudo() {
+  if [[ "${EUID}" -eq 0 ]]; then
+    return
+  fi
+
+  log "Refreshing sudo credentials"
+  sudo -v
+}
+
+install_with_pacman() {
+  local packages=(git ansible curl ca-certificates)
+  log "Installing prerequisites with pacman"
+  sudo pacman -Sy --needed --noconfirm "${packages[@]}"
+}
+
+install_prereqs() {
+  if command -v ansible-pull >/dev/null 2>&1 && command -v git >/dev/null 2>&1; then
+    log "Prerequisites already present"
+    return
+  fi
+
+  if ! command -v pacman >/dev/null 2>&1; then
+    printf 'This bootstrap currently supports Arch Linux only\n' >&2
+    exit 1
+  fi
+
+  install_with_pacman
+}
+
+parse_args() {
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --repo)
+        [[ "$#" -ge 2 ]] || { printf 'Missing value for --repo\n' >&2; exit 1; }
+        REPO_URL="${2:-}"
+        shift 2
+        ;;
+      --branch)
+        [[ "$#" -ge 2 ]] || { printf 'Missing value for --branch\n' >&2; exit 1; }
+        BRANCH="${2:-}"
+        shift 2
+        ;;
+      --playbook)
+        [[ "$#" -ge 2 ]] || { printf 'Missing value for --playbook\n' >&2; exit 1; }
+        PLAYBOOK="${2:-}"
+        shift 2
+        ;;
+      --dest)
+        [[ "$#" -ge 2 ]] || { printf 'Missing value for --dest\n' >&2; exit 1; }
+        DEST="${2:-}"
+        shift 2
+        ;;
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      --)
+        shift
+        EXTRA_ARGS=("$@")
+        break
+        ;;
+      *)
+        printf 'Unknown argument: %s\n' "$1" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [[ -z "${REPO_URL}" ]]; then
+    printf '--repo is required\n' >&2
+    usage >&2
+    exit 1
+  fi
+}
+
+run_ansible_pull() {
+  mkdir -p "${DEST}"
+
+  log "Running ansible-pull from ${REPO_URL}"
+  ansible-pull \
+    --accept-host-key \
+    --clean \
+    --directory "${DEST}" \
+    --url "${REPO_URL}" \
+    --checkout "${BRANCH}" \
+    --inventory "localhost," \
+    --limit localhost \
+    --connection local \
+    "${PLAYBOOK}" \
+    "${EXTRA_ARGS[@]}"
+}
+
+main() {
+  parse_args "$@"
+  require_sudo
+  install_prereqs
+  run_ansible_pull
+}
+
+main "$@"

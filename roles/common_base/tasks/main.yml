@@ -1,0 +1,23 @@
+---
+- name: Ensure this playbook only runs on Arch
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == "Archlinux"
+    fail_msg: "This repo currently targets Arch Linux only."
+
+- name: Install base packages
+  ansible.builtin.package:
+    name: "{{ base_packages }}"
+    state: present
+
+- name: Ensure local bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Show current convergence scope
+  ansible.builtin.debug:
+    msg:
+      - "Base playbook applied for Arch Linux"
+      - "Add more isolated playbooks under playbooks/ as the repo grows"

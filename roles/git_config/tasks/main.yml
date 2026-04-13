@@ -1,0 +1,41 @@
+---
+- name: Ensure Git is installed
+  ansible.builtin.package:
+    name: git
+    state: present
+
+- name: Read current Git user name
+  ansible.builtin.command:
+    cmd: git config --global --get user.name
+  register: git_user_name_current
+  changed_when: false
+  failed_when: false
+
+- name: Set Git user name
+  ansible.builtin.command:
+    cmd: git config --global user.name "{{ git_user_name }}"
+  when: git_user_name_current.rc != 0 or git_user_name_current.stdout != git_user_name
+
+- name: Read current Git user email
+  ansible.builtin.command:
+    cmd: git config --global --get user.email
+  register: git_user_email_current
+  changed_when: false
+  failed_when: false
+
+- name: Set Git user email
+  ansible.builtin.command:
+    cmd: git config --global user.email "{{ git_user_email }}"
+  when: git_user_email_current.rc != 0 or git_user_email_current.stdout != git_user_email
+
+- name: Read current Git editor
+  ansible.builtin.command:
+    cmd: git config --global --get core.editor
+  register: git_core_editor_current
+  changed_when: false
+  failed_when: false
+
+- name: Set Git editor
+  ansible.builtin.command:
+    cmd: git config --global core.editor "{{ git_core_editor }}"
+  when: git_core_editor_current.rc != 0 or git_core_editor_current.stdout != git_core_editor

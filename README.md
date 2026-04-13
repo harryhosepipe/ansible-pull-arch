@@ -1,0 +1,66 @@
+# linux-env
+
+Personal Arch Linux environment bootstrap built around `ansible-pull`.
+
+The repo is structured so you can:
+
+- bootstrap a machine with one command
+- keep machines converged to the repo over time
+- test each setup area in isolation
+
+## Layout
+
+- `bin/bootstrap`: minimal shell bootstrap that installs prerequisites and runs `ansible-pull`
+- `playbooks/`: one top-level playbook per setup area
+- `roles/`: reusable task groups
+- `group_vars/all/`: shared settings
+
+## First-run flow
+
+The bootstrap script keeps its job small:
+
+1. install the minimum prerequisites needed for `ansible-pull`
+2. run the chosen playbook from this repo against `localhost`
+
+## Intended usage
+
+Use the bootstrap script from raw GitHub:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/<your-user>/<your-repo>/main/bin/bootstrap | bash -s -- \
+  --repo https://github.com/<your-user>/<your-repo>.git \
+  --playbook playbooks/base.yml
+```
+
+Safer inspectable variant:
+
+```bash
+curl -fsSLo /tmp/linux-env-bootstrap.sh https://raw.githubusercontent.com/<your-user>/<your-repo>/main/bin/bootstrap
+bash /tmp/linux-env-bootstrap.sh --repo https://github.com/<your-user>/<your-repo>.git --playbook playbooks/base.yml
+```
+
+## Current scope
+
+The initial scaffold includes:
+
+- a base playbook
+- a git playbook
+- Arch package installation
+- conservative, idempotent defaults
+- a separate secrets playbook stub for Doppler-based setup
+
+## Next additions
+
+As you grow the repo, add isolated playbooks such as:
+
+- `playbooks/shell.yml`
+- `playbooks/neovim.yml`
+- `playbooks/desktop.yml`
+- `playbooks/secrets.yml`
+
+## Current playbooks
+
+- `playbooks/base.yml`: base packages and common machine setup
+- `playbooks/git.yml`: global Git identity and editor
+- `playbooks/github.yml`: installs GitHub CLI
+- `playbooks/secrets.yml`: secrets tooling stub for later Doppler setup
